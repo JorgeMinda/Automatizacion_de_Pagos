@@ -143,6 +143,7 @@ export const LoginPage: React.FC = () => {
                 <input
                   type="text"
                   required
+                  autoComplete="username"
                   placeholder="ejemplo@colegio.edu.ec"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -158,6 +159,7 @@ export const LoginPage: React.FC = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   required
+                  autoComplete="current-password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -217,7 +219,7 @@ export const LoginPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickFill('admin@colegio.edu.ec', 'adminpassword')}
+                onClick={() => handleQuickFill('admin.luxlunch@colegio.edu.ec', 'password123')}
                 className="p-2 rounded-xl liquid-control text-[11px] font-bold text-purple-600 dark:text-purple-400 text-center"
               >
                 Admin
