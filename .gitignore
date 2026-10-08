@@ -1,6 +1,7 @@
 node_modules/
 .wasp/*
-!.wasp/build
+!.wasp/out
+!.wasp/out/**
 .env
 .env.*
 dist/
