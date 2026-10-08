@@ -5,7 +5,7 @@
   "type": "module",
   "comment-filip": "The server.js location changed because we have now included client source files above .wasp/out/server/src.",
   "scripts": {
-    "bundle": "esbuild src/server.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=bundle/server.js",
+    "bundle": "npx esbuild src/server.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=bundle/server.js",
     "start": "node --enable-source-maps -r dotenv/config bundle/server.js",
     "bundle-and-start": "npm run bundle && npm run start",
     "watch": "nodemon --exec 'npm run bundle-and-start || exit 1'",
@@ -21,16 +21,18 @@
     "node": ">=24.14.1"
   },
   "prisma": {},
-  "dependencies": {"@wasp.sh/lib-auth": "file:../libs/auth/wasp.sh-lib-auth-0.25.0.tgz",
-  "@wasp.sh/lib-vite-ssr": "file:../libs/vite-ssr/wasp.sh-lib-vite-ssr-0.25.0.tgz",
-  "cookie-parser": "~1.4.6",
-  "cors": "^2.8.5",
-  "dotenv": "^16.6.1",
-  "express": "~5.1.0",
-  "helmet": "^6.0.0",
-  "morgan": "~1.10.0",
-  "superjson": "^2.2.1"
-},
+  "dependencies": {
+    "@wasp.sh/lib-auth": "file:../libs/auth/wasp.sh-lib-auth-0.25.0.tgz",
+    "@wasp.sh/lib-vite-ssr": "file:../libs/vite-ssr/wasp.sh-lib-vite-ssr-0.25.0.tgz",
+    "cookie-parser": "~1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "esbuild": "^0.25.0",
+    "express": "~5.1.0",
+    "helmet": "^6.0.0",
+    "morgan": "~1.10.0",
+    "superjson": "^2.2.1"
+  },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@types/cors": "^2.8.5",
