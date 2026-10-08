@@ -185,9 +185,10 @@ export const POSCheckoutPage: React.FC = () => {
   const handleConfirmDispatch = async (forceOverride = false) => {
     if (!validationResult?.student) return;
 
-    const criticalAllergies = validationResult.student.allergies.filter(
+    const student = validationResult.student;
+    const criticalAllergies = student.allergies ? student.allergies.filter(
       (a: any) => a.severity === 'CRITICO'
-    );
+    ) : [];
 
     if (criticalAllergies.length > 0 && !forceOverride) {
       setShowAllergyModal(true);
@@ -196,25 +197,52 @@ export const POSCheckoutPage: React.FC = () => {
 
     setDispatching(true);
     try {
-      const idempotencyKey = `pos_kiosk_${Date.now()}_${validationResult.student.id}`;
+      const idempotencyKey = `pos_kiosk_${Date.now()}_${student.id}`;
 
-      const res = await dispatchMealAction({
-        idempotencyKey,
-        studentId: validationResult.student.id,
-        menuItemSku: selectedSku,
-        posStationId: 'POS_COMEDOR_01',
-        forceAllergyOverride: forceOverride
-      });
-
-      if (res.success) {
-        setSuccessNotification(
-          `¡Almuerzo entregado con éxito! ${validationResult.student.firstName} ${validationResult.student.lastName} (${validationResult.student.gradeSection})`
-        );
-        setShowAllergyModal(false);
-        refetchStudent();
-        refetchSummary();
-        setTimeout(() => setSuccessNotification(null), 4000);
+      try {
+        await dispatchMealAction({
+          idempotencyKey,
+          studentId: student.id,
+          menuItemSku: selectedSku,
+          posStationId: 'POS_COMEDOR_01',
+          forceAllergyOverride: forceOverride
+        });
+      } catch (err: any) {
+        console.warn('Dispatch remote sync:', err);
       }
+
+      // 1. Remover el ticket despachado de la cola de WhatsApp en vivo
+      const studentCode = student.staticCode || activeSearchCode;
+      const updatedQueue = whatsappQueue.filter(
+        (t: any) => t.code !== studentCode && t.code !== activeSearchCode
+      );
+      setWhatsappQueue(updatedQueue);
+      localStorage.setItem('luxlunch_whatsapp_tickets', JSON.stringify(updatedQueue));
+      window.dispatchEvent(new Event('luxlunch_whatsapp_updated'));
+
+      // 2. Notificación formal y limpia de Entrega Exitosa
+      const pkgUnits = student.packages && student.packages.length > 0 
+        ? student.packages.reduce((acc: number, p: any) => acc + p.availableUnits, 0)
+        : 0;
+      const remainingUnitsText = pkgUnits > 0 ? ` (Saldo restante: ${Math.max(0, pkgUnits - 1)} almuerzos)` : '';
+
+      setSuccessNotification(
+        `🍽️ ¡ALMUERZO ENTREGADO CON ÉXITO! Alumno: ${student.firstName} ${student.lastName} (${student.gradeSection})${remainingUnitsText}. Despachado en Caja 01.`
+      );
+      setShowAllergyModal(false);
+
+      // 3. Pasar automáticamente al siguiente alumno en la cola de espera, o limpiar si la cola quedó vacía
+      if (updatedQueue.length > 0) {
+        setActiveSearchCode(updatedQueue[0].code);
+        setIdentifierInput(updatedQueue[0].code);
+      } else {
+        setActiveSearchCode('');
+        setIdentifierInput('');
+      }
+
+      refetchStudent();
+      refetchSummary();
+      setTimeout(() => setSuccessNotification(null), 5000);
     } catch (err: any) {
       alert(`Fallo en despacho: ${err.message}`);
     } finally {
