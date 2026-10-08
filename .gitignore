@@ -1,5 +1,6 @@
 node_modules/
-.wasp/
+.wasp/*
+!.wasp/build
 .env
 .env.*
 dist/
