@@ -20,8 +20,9 @@ services:
         sync: false
 
   # 2. Frontend Static Site (React Vite SPA)
-  - type: static
+  - type: web
     name: luxlunch-client
+    runtime: static
     rootDir: .wasp/build/web-app
     buildCommand: npm install && npm run build
     staticPublishPath: build
