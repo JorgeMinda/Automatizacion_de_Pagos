@@ -11,7 +11,8 @@ const waspDevClientEnvSchema = z.object({
         .default("http://localhost:3001"),
 });
 const waspProdClientEnvSchema = z.object({
-    "REACT_APP_API_URL": serverUrlSchema,
+    "REACT_APP_API_URL": serverUrlSchema
+        .default("https://luxlunch-server.onrender.com"),
 });
 const waspClientEnvSchema = import.meta.env.MODE === "production"
     ? waspProdClientEnvSchema
