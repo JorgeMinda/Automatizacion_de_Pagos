@@ -1,0 +1,218 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  PADRE
+  CAJERO
+  ADMIN
+}
+
+enum PaymentStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
+enum PaymentDestination {
+  PAQUETE
+  MONEDERO
+}
+
+enum ProductType {
+  SIMPLE
+  PRODUCIDO
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+}
+
+enum AllergySeverity {
+  MODERADO
+  CRITICO
+}
+
+enum LedgerEntryType {
+  DEBIT
+  CREDIT
+}
+
+model User {
+  id              String           @id @default(uuid())
+  email           String           @unique
+  password        String
+  fullName        String
+  role            UserRole         @default(PADRE)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  students        Student[]        @relation("ParentStudents")
+  payments        Payment[]
+  deliveries      DeliveryRecord[] @relation("CashierDeliveries")
+  auditLogs       AuditLog[]
+
+  @@index([role])
+}
+
+model Student {
+  id              String           @id @default(uuid())
+  parentId        String
+  parent          User             @relation("ParentStudents", fields: [parentId], references: [id], onDelete: Restrict)
+  firstName       String
+  lastName        String
+  gradeSection    String           // Ej: "5º EGB - Paralelo B"
+  photoUrl        String?
+  qrSeed          String           @unique @default(uuid())
+  staticCode      String           @unique
+  walletBalance   Decimal          @default(0.00) @db.Decimal(10, 2)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  packages        MealPackage[]
+  deliveries      DeliveryRecord[]
+  allergies       StudentAllergy[]
+  ledgerAccounts  LedgerAccount[]
+
+  @@index([parentId])
+  @@index([staticCode])
+  @@index([gradeSection])
+}
+
+model StudentAllergy {
+  id              String           @id @default(uuid())
+  studentId       String
+  student         Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  allergen        String
+  description     String
+  severity        AllergySeverity  @default(MODERADO)
+  createdAt       DateTime         @default(now())
+
+  @@index([studentId])
+}
+
+model Payment {
+  id              String              @id @default(uuid())
+  userId          String
+  user            User                @relation(fields: [userId], references: [id], onDelete: Restrict)
+  amount          Decimal             @db.Decimal(10, 2)
+  destination     PaymentDestination
+  status          PaymentStatus       @default(PENDIENTE)
+  bankReference   String              @unique
+  metadata        Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  mealPackages    MealPackage[]
+  ledgerEntries   LedgerEntry[]
+
+  @@index([userId])
+  @@index([bankReference])
+  @@index([status])
+}
+
+model MealPackage {
+  id                String           @id @default(uuid())
+  studentId         String
+  student           Student          @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  paymentId         String
+  payment           Payment          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  totalUnits        Int
+  availableUnits    Int
+  unitPrice         Decimal          @db.Decimal(10, 2)
+  expiresAt         DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  deliveries        DeliveryRecord[]
+
+  @@index([studentId, availableUnits])
+  @@index([paymentId])
+}
+
+model MenuItemRecipe {
+  id                String           @id @default(uuid())
+  skuPontifico      String           @unique
+  name              String
+  type              ProductType      @default(PRODUCIDO)
+  price             Decimal          @db.Decimal(10, 2)
+  active            Boolean          @default(true)
+  recipeBOM         Json?            // Array de { rawMaterialSku: string, quantity: number, unit: string }
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  deliveries        DeliveryRecord[]
+
+  @@index([skuPontifico])
+  @@index([type])
+}
+
+model DeliveryRecord {
+  id                String           @id @default(uuid())
+  idempotencyKey    String           @unique
+  studentId         String
+  student           Student          @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  cashierId         String
+  cashier           User             @relation("CashierDeliveries", fields: [cashierId], references: [id], onDelete: Restrict)
+  packageId         String?
+  mealPackage       MealPackage?     @relation(fields: [packageId], references: [id], onDelete: Restrict)
+  menuItemId        String
+  menuItem          MenuItemRecipe   @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  posStationId      String
+  syncStatus        SyncStatus       @default(PENDING)
+  deliveredAt       DateTime         @default(now())
+
+  @@index([studentId])
+  @@index([idempotencyKey])
+  @@index([deliveredAt])
+  @@index([syncStatus])
+}
+
+model LedgerAccount {
+  id                String           @id @default(uuid())
+  studentId         String?
+  student           Student?         @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  accountType       String           // "STUDENT_WALLET", "REVENUE_SALES", "CASH_GATEWAY"
+  currency          String           @default("USD")
+  createdAt         DateTime         @default(now())
+
+  entries           LedgerEntry[]
+
+  @@unique([studentId, accountType])
+}
+
+model LedgerEntry {
+  id                String           @id @default(uuid())
+  accountId         String
+  account           LedgerAccount    @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  paymentId         String?
+  payment           Payment?         @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  type              LedgerEntryType
+  amount            Decimal          @db.Decimal(10, 2)
+  description       String
+  createdAt         DateTime         @default(now())
+
+  @@index([accountId])
+  @@index([paymentId])
+}
+
+model AuditLog {
+  id                String           @id @default(uuid())
+  userId            String?
+  user              User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action            String
+  entityType        String
+  entityId          String
+  payload           Json?
+  createdAt         DateTime         @default(now())
+
+  @@index([action])
+  @@index([entityId])
+}
