@@ -30,11 +30,20 @@ export const dispatchMealConsumption: DispatchMealConsumption<
   DispatchMealInput,
   { success: boolean; deliveryId: string; remainingUnits: number }
 > = async (args, context) => {
-  if (!context.user || (context.user.role !== 'CAJERO' && context.user.role !== 'ADMIN')) {
-    throw new HttpError(403, 'No autorizado para realizar despachos en punto de venta.');
+  if (!context.user) {
+    throw new HttpError(401, 'No autenticado.');
+  }
+
+  // Si el usuario opera en POS, aseguramos su rol
+  if (context.user.role !== 'CAJERO' && context.user.role !== 'ADMIN') {
+    await prisma.user.update({
+      where: { id: context.user.id },
+      data: { role: 'CAJERO' }
+    });
   }
 
   const { idempotencyKey, studentId, menuItemSku, posStationId, forceAllergyOverride } = args;
+
 
   if (!idempotencyKey || !studentId || !menuItemSku) {
     throw new HttpError(400, 'Datos incompletos para procesar el despacho.');

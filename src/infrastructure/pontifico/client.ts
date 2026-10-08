@@ -32,33 +32,47 @@ export class PontificoERPAdapter {
   }
 
   public async syncInventoryDeduction(
-    payload: PontificoSyncPayload
-  ): Promise<{ status: 'SUCCESS' | 'FAILED'; ackId?: string; error?: string }> {
+    payload: PontificoSyncPayload,
+    maxRetries: number = 5
+  ): Promise<{ status: 'SUCCESS' | 'FAILED'; ackId?: string; error?: string; retries?: number }> {
     const rawBody = JSON.stringify(payload);
     const signature = this.generateHmacSignature(rawBody);
 
-    try {
-      const response = await fetch(`${this.baseUrl}/inventory/atomic-deduct`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Pontifico-Signature': signature,
-          'X-Idempotency-Key': payload.eventId
-        },
-        body: rawBody
-      });
+    let attempt = 0;
+    let lastError = '';
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[PontificoERPAdapter] Error ${response.status}: ${errorText}`);
-        return { status: 'FAILED', error: errorText };
+    while (attempt < maxRetries) {
+      attempt++;
+      try {
+        const response = await fetch(`${this.baseUrl}/inventory/atomic-deduct`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Pontifico-Signature': signature,
+            'X-Idempotency-Key': payload.eventId,
+          },
+          body: rawBody,
+        });
+
+        if (response.ok) {
+          const data = (await response.json()) as { ackId?: string };
+          return { status: 'SUCCESS', ackId: data.ackId || 'ACK_' + payload.eventId, retries: attempt };
+        }
+
+        lastError = await response.text();
+        console.warn(`[PontificoERPAdapter] Intento ${attempt}/${maxRetries} fallido (${response.status}): ${lastError}`);
+      } catch (err: any) {
+        lastError = err.message || 'Error desconocido';
+        console.warn(`[PontificoERPAdapter] Intento ${attempt}/${maxRetries} excepción de red: ${lastError}`);
       }
 
-      const data = (await response.json()) as { ackId?: string };
-      return { status: 'SUCCESS', ackId: data.ackId || 'ACK_' + payload.eventId };
-    } catch (error: any) {
-      console.error('[PontificoERPAdapter] Excepción de conexión:', error.message);
-      return { status: 'FAILED', error: error.message };
+      // Exponential backoff: 2^attempt * 100ms
+      if (attempt < maxRetries) {
+        const backoffMs = Math.pow(2, attempt) * 100;
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+      }
     }
+
+    return { status: 'FAILED', error: lastError, retries: attempt };
   }
 }

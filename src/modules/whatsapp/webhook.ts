@@ -29,12 +29,12 @@ export const handleWhatsAppWebhook = async (req: any, res: any, context: any) =>
     price: Number(item.price)
   }));
 
-  const replyMessage = WhatsAppStateMachine.processMessage(textBody, formattedMenu);
+  const replyResult = WhatsAppStateMachine.processMessage(textBody, formattedMenu);
 
   const messenger = new WhatsAppCloudApiAdapter();
-  await messenger.sendTextMessage(fromNumber, replyMessage);
+  await messenger.sendTextMessage(fromNumber, replyResult.reply);
 
-  return res.status(200).json({ status: 'PROCESSED' });
+  return res.status(200).json({ status: 'PROCESSED', nextState: replyResult.nextState });
 };
 
 export const verifyWhatsAppWebhook = (req: any, res: any) => {

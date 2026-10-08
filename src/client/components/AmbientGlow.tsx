@@ -1,16 +1,37 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 export const AmbientGlow: React.FC = () => {
+  const { isDark } = useTheme();
+
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Glow Superior Izquierdo - Violeta Profundo */}
-      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#9d4edd]/15 rounded-full blur-[160px]" />
-      
-      {/* Glow Centro Derecho - Neón Rosa/Fucsia */}
-      <div className="absolute top-1/3 -right-40 w-[550px] h-[550px] bg-[#f72585]/12 rounded-full blur-[180px]" />
-      
-      {/* Glow Inferior Izquierdo - Cian Neón */}
-      <div className="absolute -bottom-40 left-1/4 w-[450px] h-[450px] bg-[#4cc9f0]/10 rounded-full blur-[150px]" />
+      {/* Luz Refractiva Superior Izquierda (Azul Eléctrico / Cyan Apple) */}
+      <div 
+        className={`absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full blur-[140px] transition-all duration-700 ${
+          isDark 
+            ? 'bg-blue-600/15' 
+            : 'bg-blue-400/12'
+        }`} 
+      />
+
+      {/* Luz Refractiva Centro Derecha (Espectro Arcoíris / Rosa / Violeta) */}
+      <div 
+        className={`absolute top-1/4 -right-32 w-[650px] h-[650px] rounded-full blur-[160px] transition-all duration-700 ${
+          isDark 
+            ? 'bg-purple-600/12' 
+            : 'bg-indigo-300/15'
+        }`} 
+      />
+
+      {/* Luz Refractiva Inferior (Verde Esmeralda Apple) */}
+      <div 
+        className={`absolute -bottom-40 left-1/3 w-[550px] h-[550px] rounded-full blur-[140px] transition-all duration-700 ${
+          isDark 
+            ? 'bg-emerald-500/12' 
+            : 'bg-emerald-300/15'
+        }`} 
+      />
     </div>
   );
 };

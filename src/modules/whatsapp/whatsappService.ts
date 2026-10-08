@@ -1,5 +1,19 @@
 export interface IWhatsAppMessengerPort {
   sendTextMessage(to: string, message: string): Promise<boolean>;
+  sendMealConsumedNotification(
+    to: string,
+    studentName: string,
+    gradeSection: string,
+    timeStr: string,
+    remainingBalance: number,
+    remainingMeals: number
+  ): Promise<boolean>;
+  sendLowBalanceAlert(
+    to: string,
+    studentName: string,
+    currentBalance: number,
+    remainingMeals: number
+  ): Promise<boolean>;
 }
 
 export class WhatsAppCloudApiAdapter implements IWhatsAppMessengerPort {
@@ -13,7 +27,7 @@ export class WhatsAppCloudApiAdapter implements IWhatsAppMessengerPort {
 
   public async sendTextMessage(to: string, message: string): Promise<boolean> {
     if (!this.token || !this.phoneNumberId) {
-      console.warn(`[WhatsAppCloudApiAdapter] Credenciales no configuradas. Mock dispatch a ${to}: ${message}`);
+      console.log(`[WhatsApp Bot Outbound] A: ${to} ->\n${message}`);
       return true;
     }
 
@@ -22,15 +36,15 @@ export class WhatsAppCloudApiAdapter implements IWhatsAppMessengerPort {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${this.token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           messaging_product: 'whatsapp',
           recipient_type: 'individual',
           to,
           type: 'text',
-          text: { preview_url: false, body: message }
-        })
+          text: { preview_url: false, body: message },
+        }),
       });
 
       return res.ok;
@@ -38,5 +52,32 @@ export class WhatsAppCloudApiAdapter implements IWhatsAppMessengerPort {
       console.error('[WhatsAppCloudApiAdapter] Error enviando mensaje:', err.message);
       return false;
     }
+  }
+
+  public async sendMealConsumedNotification(
+    to: string,
+    studentName: string,
+    gradeSection: string,
+    timeStr: string,
+    remainingBalance: number,
+    remainingMeals: number
+  ): Promise<boolean> {
+    const message =
+      `🍏 *¡Comedor Escolar!* Tu hijo(a) *${studentName}* (${gradeSection}) acaba de retirar su almuerzo en el comedor a las *${timeStr}*.\n\n` +
+      `📊 *Saldo restante:* $${remainingBalance.toFixed(2)} (${remainingMeals} almuerzos disponibles en paquete).`;
+    return this.sendTextMessage(to, message);
+  }
+
+  public async sendLowBalanceAlert(
+    to: string,
+    studentName: string,
+    currentBalance: number,
+    remainingMeals: number
+  ): Promise<boolean> {
+    const message =
+      `⚠️ *Alerta de Saldo:* El saldo de *${studentName}* es de *$${currentBalance.toFixed(2)}* (${remainingMeals} almuerzos restantes).\n\n` +
+      `📲 Recarga directo aquí para evitar interrupciones en el servicio:\n` +
+      `👉 https://pagos.comedorescolar.com/recargar`;
+    return this.sendTextMessage(to, message);
   }
 }

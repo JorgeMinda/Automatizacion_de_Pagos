@@ -9,14 +9,14 @@ module.exports = {
     extend: {
       colors: {
         lux: {
-          bg: '#08050e',
-          surface: 'rgba(18, 10, 30, 0.45)',
-          amber: '#f59e0b',
-          amberGlow: 'rgba(245, 158, 11, 0.4)',
-          orange: '#ff6b35',
-          purple: '#9d4edd',
-          pink: '#f72585',
-          emerald: '#10b981'
+          bg: '#ede8e1',
+          bgWarm: '#f8f5f0',
+          card: 'rgba(255, 255, 255, 0.65)',
+          amber: '#d97706',
+          amberLight: '#f59e0b',
+          goldBorder: 'rgba(217, 119, 6, 0.35)',
+          dark: '#1c1917',
+          muted: '#78716c'
         }
       },
       fontFamily: {
@@ -25,10 +25,9 @@ module.exports = {
         mono: ['Space Grotesk', 'monospace']
       },
       boxShadow: {
-        'glass-luxury': '0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)',
-        'glass-layer': '0 30px 60px rgba(0, 0, 0, 0.6), inset 0 2px 2px rgba(255, 255, 255, 0.35)',
-        'btn-amber': '0 10px 25px -5px rgba(245, 158, 11, 0.5)',
-        'btn-purple': '0 10px 25px -5px rgba(157, 78, 221, 0.5)'
+        'glass-slab': '0 30px 60px -12px rgba(180, 140, 100, 0.28), 0 18px 36px -18px rgba(0, 0, 0, 0.1), inset 0 1.5px 2px rgba(255, 255, 255, 0.9), inset 0 -1.5px 2px rgba(217, 119, 6, 0.2)',
+        'glass-float': '0 20px 40px -10px rgba(180, 140, 100, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+        'btn-gold': '0 10px 25px -5px rgba(217, 119, 6, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.5)'
       }
     }
   },

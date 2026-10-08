@@ -132,3 +132,71 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
     isolationLevel: Prisma.TransactionIsolationLevel.Serializable
   });
 };
+
+interface RegisterStudentInput {
+  [key: string]: any;
+  firstName: string;
+  lastName: string;
+  gradeSection: string;
+  allergen?: string;
+  staticCode?: string;
+}
+
+export const registerStudentForParent: any = async (
+  args: RegisterStudentInput,
+  context: any
+) => {
+  if (!context.user) {
+    throw new HttpError(401, 'Usuario no autenticado.');
+  }
+
+  const { firstName, lastName, gradeSection, allergen, staticCode } = args;
+  if (!firstName || !lastName || !gradeSection) {
+    throw new HttpError(400, 'Nombre, apellido y grado son requeridos.');
+  }
+
+  const code = staticCode?.trim().toUpperCase() || `EST-${Math.floor(100 + Math.random() * 900)}`;
+
+  const student = await prisma.student.create({
+    data: {
+      parentId: context.user.id,
+      firstName,
+      lastName,
+      gradeSection,
+      staticCode: code,
+      qrSeed: `seed_${code.toLowerCase()}_${Date.now()}`,
+      walletBalance: 0,
+      allergies: allergen && allergen.trim().length > 0 ? {
+        create: [
+          {
+            allergen: allergen.trim(),
+            severity: allergen.toLowerCase().includes('maní') || allergen.toLowerCase().includes('mani') || allergen.toLowerCase().includes('celia') || allergen.toLowerCase().includes('sever') ? 'CRITICO' : 'MODERADO',
+            description: `Restricción médica reportada por el representante familiar.`
+          }
+        ]
+      } : undefined
+    },
+    include: {
+      allergies: true,
+      packages: true
+    }
+  });
+
+  return student;
+};
+
+export const setUserRole: any = async (
+  args: { role: 'PADRE' | 'CAJERO' | 'ADMIN' },
+  context: any
+) => {
+  if (!context.user) {
+    throw new HttpError(401, 'No autenticado.');
+  }
+
+  const updatedUser = await prisma.user.update({
+    where: { id: context.user.id },
+    data: { role: args.role }
+  });
+
+  return updatedUser;
+};

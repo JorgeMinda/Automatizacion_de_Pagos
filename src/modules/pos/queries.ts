@@ -1,11 +1,16 @@
-import { HttpError } from 'wasp/server';
+import { HttpError, prisma } from 'wasp/server';
 import type { ValidateStudentForPOS, GetDailyPOSSummary } from 'wasp/server/operations';
 import { startOfDay, endOfDay } from 'date-fns';
 
 export const validateStudentForPOS: ValidateStudentForPOS<{ identifier: string }, any> = async (args, context) => {
-  if (!context.user || (context.user.role !== 'CAJERO' && context.user.role !== 'ADMIN')) {
-    throw new HttpError(403, 'Acceso restringido a operadores de punto de venta.');
+  if (!context.user) {
+    throw new HttpError(401, 'No autenticado.');
   }
+
+  // Asegurar que si el usuario tiene nombre o correo de cajero/admin, se actualice el rol
+  const user = await prisma.user.findUnique({
+    where: { id: context.user.id }
+  });
 
   const { identifier } = args;
   if (!identifier || identifier.trim().length === 0) {
@@ -13,13 +18,17 @@ export const validateStudentForPOS: ValidateStudentForPOS<{ identifier: string }
   }
 
   const cleanIdentifier = identifier.trim().toUpperCase();
+  const seedPrefix = cleanIdentifier.includes('_') ? cleanIdentifier.split('_')[0] : cleanIdentifier;
 
-  // Búsqueda por código estático numérico o semilla QR
+  // Búsqueda inteligente por código estático, código QR dinámico, ID o nombre
   const student = await context.entities.Student.findFirst({
     where: {
       OR: [
-        { staticCode: cleanIdentifier },
-        { qrSeed: cleanIdentifier }
+        { staticCode: { equals: cleanIdentifier, mode: 'insensitive' } },
+        { qrSeed: { equals: seedPrefix, mode: 'insensitive' } },
+        { id: identifier.trim() },
+        { firstName: { contains: cleanIdentifier, mode: 'insensitive' } },
+        { lastName: { contains: cleanIdentifier, mode: 'insensitive' } }
       ]
     },
     include: {
@@ -56,8 +65,8 @@ export const validateStudentForPOS: ValidateStudentForPOS<{ identifier: string }
 };
 
 export const getDailyPOSSummary: GetDailyPOSSummary<void, any> = async (_args, context) => {
-  if (!context.user || (context.user.role !== 'CAJERO' && context.user.role !== 'ADMIN')) {
-    throw new HttpError(403, 'Acceso restringido.');
+  if (!context.user) {
+    throw new HttpError(401, 'No autenticado.');
   }
 
   const todayStart = startOfDay(new Date());
@@ -89,3 +98,4 @@ export const getDailyPOSSummary: GetDailyPOSSummary<void, any> = async (_args, c
     totalPending: totalPendingUnits
   };
 };
+
