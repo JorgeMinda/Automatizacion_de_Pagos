@@ -6,6 +6,8 @@ node_modules/
 .env
 .env.*
 dist/
+!sdk/wasp/dist/
+!sdk/wasp/dist/**
 build/
 *.log
 MobaXterm*

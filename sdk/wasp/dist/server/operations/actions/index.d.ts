@@ -1,0 +1,20 @@
+import { type AuthenticatedOperationFor } from '../wrappers.js';
+import { processDirectPayment as processDirectPayment_ext } from 'wasp/src/modules/payments/actions';
+import { registerStudentForParent as registerStudentForParent_ext } from 'wasp/src/modules/payments/actions';
+import { setUserRole as setUserRole_ext } from 'wasp/src/modules/payments/actions';
+import { dispatchMealConsumption as dispatchMealConsumption_ext } from 'wasp/src/modules/pos/actions';
+import { syncOfflineBatchDeliveries as syncOfflineBatchDeliveries_ext } from 'wasp/src/modules/pos/actions';
+import { createMenuItemRecipe as createMenuItemRecipe_ext } from 'wasp/src/modules/inventory/actions';
+export type ProcessDirectPayment_ext = typeof processDirectPayment_ext;
+export declare const processDirectPayment: AuthenticatedOperationFor<ProcessDirectPayment_ext>;
+export type RegisterStudentForParent_ext = typeof registerStudentForParent_ext;
+export declare const registerStudentForParent: AuthenticatedOperationFor<RegisterStudentForParent_ext>;
+export type SetUserRole_ext = typeof setUserRole_ext;
+export declare const setUserRole: AuthenticatedOperationFor<SetUserRole_ext>;
+export type DispatchMealConsumption_ext = typeof dispatchMealConsumption_ext;
+export declare const dispatchMealConsumption: AuthenticatedOperationFor<DispatchMealConsumption_ext>;
+export type SyncOfflineBatchDeliveries_ext = typeof syncOfflineBatchDeliveries_ext;
+export declare const syncOfflineBatchDeliveries: AuthenticatedOperationFor<SyncOfflineBatchDeliveries_ext>;
+export type CreateMenuItemRecipe_ext = typeof createMenuItemRecipe_ext;
+export declare const createMenuItemRecipe: AuthenticatedOperationFor<CreateMenuItemRecipe_ext>;
+//# sourceMappingURL=index.d.ts.map
