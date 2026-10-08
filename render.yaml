@@ -1,0 +1,32 @@
+services:
+  # 1. Backend Web Service (Node.js API)
+  - type: web
+    name: luxlunch-server
+    runtime: node
+    plan: free
+    rootDir: .wasp/build/server
+    buildCommand: npm install && npx prisma generate
+    startCommand: npx prisma db push && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: WASP_WEB_CLIENT_URL
+        sync: false
+
+  # 2. Frontend Static Site (React Vite SPA)
+  - type: web
+    name: luxlunch-client
+    runtime: static
+    plan: free
+    rootDir: .wasp/build/web-app
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false
