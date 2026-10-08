@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Apple Liquid Glass - Modo Claro (Default) */
+    --liquid-bg-base: #f0f2f7;
+    --liquid-bg-mesh: radial-gradient(circle at 18% 18%, rgba(0, 122, 255, 0.08) 0%, transparent 45%),
+                      radial-gradient(circle at 82% 82%, rgba(52, 199, 89, 0.07) 0%, transparent 45%),
+                      radial-gradient(circle at 50% 50%, rgba(255, 149, 0, 0.06) 0%, transparent 55%),
+                      linear-gradient(180deg, #f5f7fc 0%, #ebedf5 100%);
+    
+    --liquid-glass-surface: rgba(255, 255, 255, 0.62);
+    --liquid-glass-surface-subtle: rgba(255, 255, 255, 0.42);
+    --liquid-glass-surface-solid: rgba(255, 255, 255, 0.88);
+    --liquid-glass-border: rgba(255, 255, 255, 0.85);
+    --liquid-glass-border-subtle: rgba(255, 255, 255, 0.55);
+    
+    --liquid-specular-highlight: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95), 
+                                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03);
+    
+    --liquid-shadow-soft: 0 10px 30px -5px rgba(0, 18, 50, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    --liquid-shadow-elevated: 0 24px 50px -12px rgba(0, 20, 60, 0.10), 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    --liquid-shadow-floating: 0 35px 80px -15px rgba(0, 25, 75, 0.14), 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+
+    --liquid-text-primary: #1d1d1f;
+    --liquid-text-secondary: #6e6e73;
+    --liquid-text-tertiary: #86868b;
+
+    /* Acentos Activos Vibrantes de Apple */
+    --apple-green: #34c759;
+    --apple-green-hover: #30b753;
+    --apple-blue: #007aff;
+    --apple-blue-hover: #006ee6;
+    --apple-rainbow: linear-gradient(135deg, #007aff 0%, #5856d6 25%, #af52de 50%, #ff2d55 75%, #ff9500 90%, #ffcc00 100%);
+    --apple-sunset: linear-gradient(135deg, #ff2d55 0%, #ff9500 50%, #ffcc00 100%);
+  }
+
+  html.dark {
+    /* Apple Liquid Glass - Modo Oscuro (Obsidian Glass) */
+    --liquid-bg-base: #0a0d14;
+    --liquid-bg-mesh: radial-gradient(circle at 18% 18%, rgba(0, 122, 255, 0.16) 0%, transparent 50%),
+                      radial-gradient(circle at 82% 82%, rgba(255, 45, 85, 0.14) 0%, transparent 50%),
+                      radial-gradient(circle at 50% 50%, rgba(52, 199, 89, 0.10) 0%, transparent 55%),
+                      linear-gradient(180deg, #0d111a 0%, #06080d 100%);
+    
+    --liquid-glass-surface: rgba(22, 28, 42, 0.58);
+    --liquid-glass-surface-subtle: rgba(18, 24, 38, 0.40);
+    --liquid-glass-surface-solid: rgba(26, 34, 52, 0.85);
+    --liquid-glass-border: rgba(255, 255, 255, 0.18);
+    --liquid-glass-border-subtle: rgba(255, 255, 255, 0.10);
+    
+    --liquid-specular-highlight: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.32), 
+                                inset 0 -1px 1px 0 rgba(0, 0, 0, 0.50);
+    
+    --liquid-shadow-soft: 0 12px 35px -5px rgba(0, 0, 0, 0.50), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --liquid-shadow-elevated: 0 25px 60px -10px rgba(0, 0, 0, 0.65), 0 2px 6px 0 rgba(0, 0, 0, 0.4);
+    --liquid-shadow-floating: 0 40px 90px -15px rgba(0, 0, 0, 0.80), 0 4px 12px 0 rgba(0, 0, 0, 0.5);
+
+    --liquid-text-primary: #f5f5f7;
+    --liquid-text-secondary: #a1a1a6;
+    --liquid-text-tertiary: #6e6e73;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--liquid-bg-base);
+    background-image: var(--liquid-bg-mesh);
+    background-attachment: fixed;
+    color: var(--liquid-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+  }
+}
+
+@layer utilities {
+  /* ==========================================================================
+     APPLE LIQUID GLASS COMPONENTS & OPTICAL REFRACTIONS
+     ========================================================================== */
+
+  /* Contenedor Principal Liquid Glass Slab (Ventanas y Paneles Flotantes) */
+  .liquid-glass,
+  .glass-slab-light,
+  .lux-glass-container {
+    background: var(--liquid-glass-surface);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1px solid var(--liquid-glass-border);
+    box-shadow: var(--liquid-specular-highlight), var(--liquid-shadow-elevated);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Cápsula / Pill Liquid Glass con Brillo Especular Refractivo */
+  .liquid-pill {
+    background: var(--liquid-glass-surface-subtle);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--liquid-glass-border-subtle);
+    box-shadow: var(--liquid-specular-highlight), var(--liquid-shadow-soft);
+    border-radius: 9999px;
+  }
+
+  /* Control de Vidrio Táctil (Botones y Selectores) */
+  .liquid-control {
+    background: var(--liquid-glass-surface);
+    backdrop-filter: blur(16px) saturate(170%);
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+    border: 1px solid var(--liquid-glass-border);
+    box-shadow: var(--liquid-specular-highlight), var(--liquid-shadow-soft);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .liquid-control:hover {
+    background: var(--liquid-glass-surface-solid);
+    transform: translateY(-1px);
+    box-shadow: var(--liquid-specular-highlight), var(--liquid-shadow-elevated);
+  }
+
+  .liquid-control:active {
+    transform: scale(0.98);
+  }
+
+  /* ==========================================================================
+     ELEMENTOS ACTIVOS CON COLOR VIBRANTE (ESTILO APPLE LIQUID GLASS)
+     ========================================================================== */
+
+  /* 1. Activo Verde Apple (Estado Exitoso / Seguro / Saldo Disponible) */
+  .liquid-active-green {
+    background: linear-gradient(135deg, #34c759 0%, #28a745 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.8), 
+                0 10px 25px -4px rgba(52, 199, 89, 0.45) !important;
+  }
+
+  /* 2. Activo Azul Eléctrico Apple (Acciones Primarias / Selección) */
+  .liquid-active-blue,
+  .btn-gold {
+    background: linear-gradient(135deg, #007aff 0%, #005bb5 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    box-shadow: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.85), 
+                0 12px 28px -5px rgba(0, 122, 255, 0.45) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .liquid-active-blue:hover,
+  .btn-gold:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1.5px);
+    box-shadow: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.95), 
+                0 16px 35px -5px rgba(0, 122, 255, 0.55) !important;
+  }
+
+  .liquid-active-blue:active,
+  .btn-gold:active {
+    transform: scale(0.97);
+  }
+
+  /* 3. Activo Degradado Arcoíris Apple Liquid (Hero Elements & Highlights) */
+  .liquid-active-rainbow {
+    background: var(--apple-rainbow) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.9), 
+                0 14px 32px -5px rgba(175, 82, 222, 0.45) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .liquid-active-rainbow:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1.5px);
+    box-shadow: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1), 
+                0 18px 40px -5px rgba(175, 82, 222, 0.6) !important;
+  }
+
+  /* 4. Activo Sunset Naranja/Amarillo (Alertas / Pendientes) */
+  .liquid-active-sunset {
+    background: var(--apple-sunset) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.85), 
+                0 12px 28px -5px rgba(255, 149, 0, 0.45) !important;
+  }
+
+  /* Lente de Aumento & Refracción Óptica Vidrio */
+  .liquid-lens {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-lens::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    pointer-events: none;
+  }
+
+  html.dark .liquid-lens::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.01) 100%);
+  }
+}

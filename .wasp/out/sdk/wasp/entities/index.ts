@@ -1,0 +1,53 @@
+import {
+  type User,
+  type Student,
+  type StudentAllergy,
+  type Payment,
+  type MealPackage,
+  type MenuItemRecipe,
+  type DeliveryRecord,
+  type LedgerAccount,
+  type LedgerEntry,
+  type AuditLog,
+} from "@prisma/client"
+
+export {
+  type User,
+  type Student,
+  type StudentAllergy,
+  type Payment,
+  type MealPackage,
+  type MenuItemRecipe,
+  type DeliveryRecord,
+  type LedgerAccount,
+  type LedgerEntry,
+  type AuditLog,
+  type Auth,
+  type AuthIdentity,
+} from "@prisma/client"
+
+export type Entity = 
+  | User
+  | Student
+  | StudentAllergy
+  | Payment
+  | MealPackage
+  | MenuItemRecipe
+  | DeliveryRecord
+  | LedgerAccount
+  | LedgerEntry
+  | AuditLog
+  | never
+
+export type EntityName = 
+  | "User"
+  | "Student"
+  | "StudentAllergy"
+  | "Payment"
+  | "MealPackage"
+  | "MenuItemRecipe"
+  | "DeliveryRecord"
+  | "LedgerAccount"
+  | "LedgerEntry"
+  | "AuditLog"
+  | never
