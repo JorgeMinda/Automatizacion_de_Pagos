@@ -1,12 +1,15 @@
 services:
-  # Servicio Web Unificado de Producción (Node.js API + React Vite UI + Prisma)
+  # 1. Backend Web Service (Node.js API)
   - type: web
-    name: luxlunch
-    runtime: docker
+    name: luxlunch-server
+    runtime: node
     plan: free
-    dockerContext: .wasp/out
-    dockerfilePath: .wasp/out/Dockerfile
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: PORT
         value: 3001
       - key: DATABASE_URL
@@ -14,4 +17,15 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: WASP_WEB_CLIENT_URL
+        sync: false
+
+  # 2. Frontend Static Site (React Vite SPA)
+  - type: web
+    name: luxlunch-client
+    runtime: static
+    rootDir: web-app
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
         sync: false
