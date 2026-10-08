@@ -1,6 +1,6 @@
 import { HttpError, prisma } from 'wasp/server';
 import { Prisma } from '@prisma/client';
-import { DoubleEntryLedgerService } from '../payments/ledgerService';
+import { DoubleEntryLedgerService } from '../payments/ledgerService.js';
 export const dispatchMealConsumption = async (args, context) => {
     if (!context.user) {
         throw new HttpError(401, 'No autenticado.');

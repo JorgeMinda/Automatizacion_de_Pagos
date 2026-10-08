@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, useQuery as rqUseQuery, } from "@tanstack/react-query";
-import { makeQueryCacheKey } from "./queries/core";
-export { configureQueryClient } from "./queryClient";
+import { makeQueryCacheKey } from "./queries/core.js";
+export { configureQueryClient } from "./queryClient.js";
 // PUBLIC API
 export function useQuery(query, queryFnArgs, options) {
     if (typeof query !== 'function') {

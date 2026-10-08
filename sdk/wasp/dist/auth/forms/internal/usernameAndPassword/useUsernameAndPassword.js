@@ -1,4 +1,4 @@
-import { login, signup } from '../../../username';
+import { login, signup } from '../../../username/index.js';
 // PRIVATE API
 export function useUsernameAndPassword({ onError, onSuccess, isLogin, }) {
     async function handleSubmit(data) {

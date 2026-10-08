@@ -1,7 +1,7 @@
 import { deserialize, serialize } from "superjson"
-import { CustomSerializableJSONValue } from "./custom-register"
+import { CustomSerializableJSONValue } from "./custom-register.js"
 
-import "./prisma"
+import "./prisma.js"
 
 export type Payload = void | SuperJSONValue;
 

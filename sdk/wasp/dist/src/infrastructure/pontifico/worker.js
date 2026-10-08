@@ -1,5 +1,5 @@
-import { PontificoERPAdapter } from './client';
-import { RecipeDecompositionService } from '../../modules/inventory/recipeService';
+import { PontificoERPAdapter } from './client.js';
+import { RecipeDecompositionService } from '../../modules/inventory/recipeService.js';
 /**
  * Worker ejecutado para sincronización de inventario con Pontífico.
  */

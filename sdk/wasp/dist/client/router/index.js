@@ -1,4 +1,4 @@
-import { interpolatePath } from './linkHelpers';
+import { interpolatePath } from './linkHelpers.js';
 // PUBLIC API
 export const routes = {
     RootRoute: {

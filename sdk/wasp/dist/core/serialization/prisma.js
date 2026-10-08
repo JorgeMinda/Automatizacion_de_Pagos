@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { registerCustom } from "superjson";
-import "./custom-register";
+import "./custom-register.js";
 const Decimal = Prisma.Decimal;
 /*
   And finally, if we have the `Decimal` type because the Prisma schema is using it,

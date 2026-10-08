@@ -1,5 +1,5 @@
 import { callOperation, makeOperationRoute } from '../internal/index.js';
-import { addResourcesUsedByQuery, getActiveOptimisticUpdates, } from '../internal/resources';
+import { addResourcesUsedByQuery, getActiveOptimisticUpdates, } from '../internal/resources.js';
 // PRIVATE API (used in the SDK)
 // todo: find ways to remove this duplication and make the type more precise.
 // Details here: https://github.com/wasp-lang/wasp/issues/2017

@@ -1,4 +1,4 @@
-import { createAction } from './core';
+import { createAction } from './core.js';
 // PUBLIC API
 export const processDirectPayment = createAction('operations/process-direct-payment', ['Payment', 'Student', 'MealPackage', 'LedgerAccount', 'LedgerEntry', 'AuditLog']);
 // PUBLIC API

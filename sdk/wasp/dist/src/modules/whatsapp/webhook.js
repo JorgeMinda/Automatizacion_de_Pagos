@@ -1,5 +1,5 @@
-import { WhatsAppStateMachine } from './stateMachine';
-import { WhatsAppCloudApiAdapter } from './whatsappService';
+import { WhatsAppStateMachine } from './stateMachine.js';
+import { WhatsAppCloudApiAdapter } from './whatsappService.js';
 export const handleWhatsAppWebhook = async (req, res, context) => {
     const body = req.body;
     if (!body || body.object !== 'whatsapp_business_account') {

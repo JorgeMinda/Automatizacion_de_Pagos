@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-      "build": "tsc && node ./scripts/copy-assets.js",
+      "build": "tsc && node ./scripts/copy-assets.js && node ./scripts/fix-imports.js",
       "test": "echo \"Error: no test specified\" && exit 1",
       "types": "tsc --declaration --emitDeclarationOnly --stripInternal --declarationDir dist"
     },

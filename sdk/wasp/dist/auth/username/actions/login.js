@@ -1,6 +1,6 @@
 import { api, handleApiError } from '../../../api/index.js';
-import { initSession } from '../../helpers/user';
-import { SessionResponseSchema } from '../../responseSchemas';
+import { initSession } from '../../helpers/user.js';
+import { SessionResponseSchema } from '../../responseSchemas.js';
 export async function login(data) {
     try {
         const { sessionId } = await api.post('/auth/username/login', {

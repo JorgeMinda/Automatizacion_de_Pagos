@@ -1,4 +1,4 @@
-import { createQuery } from './core';
+import { createQuery } from './core.js';
 // PUBLIC API
 export const getParentStudentsBalance = createQuery('operations/get-parent-students-balance', ['Student', 'MealPackage', 'StudentAllergy', 'Payment']);
 // PUBLIC API
@@ -10,5 +10,5 @@ export const getMenuItemsCatalog = createQuery('operations/get-menu-items-catalo
 // PUBLIC API
 export const getAdminLedgerAudit = createQuery('operations/get-admin-ledger-audit', ['LedgerEntry', 'LedgerAccount', 'Payment', 'AuditLog']);
 // PRIVATE API (used in SDK)
-export { buildAndRegisterQuery } from './core';
+export { buildAndRegisterQuery } from './core.js';
 //# sourceMappingURL=index.js.map

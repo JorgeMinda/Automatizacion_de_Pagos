@@ -1,6 +1,6 @@
 import { HttpError, prisma } from 'wasp/server';
 import { Prisma } from '@prisma/client';
-import { DoubleEntryLedgerService } from './ledgerService';
+import { DoubleEntryLedgerService } from './ledgerService.js';
 export const processDirectPayment = async (args, context) => {
     if (!context.user) {
         throw new HttpError(401, 'Usuario no autenticado.');
