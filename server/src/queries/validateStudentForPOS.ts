@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { validateStudentForPOS } from '../../../../../src/modules/pos/queries'
+import { validateStudentForPOS } from '../../../src/modules/pos/queries'
 
 
 export default async function (args, context) {

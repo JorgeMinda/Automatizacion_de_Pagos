@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { getAdminLedgerAudit } from '../../../../../src/modules/payments/queries'
+import { getAdminLedgerAudit } from '../../../src/modules/payments/queries'
 
 
 export default async function (args, context) {

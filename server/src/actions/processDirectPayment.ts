@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { processDirectPayment } from '../../../../../src/modules/payments/actions'
+import { processDirectPayment } from '../../../src/modules/payments/actions'
 
 
 export default async function (args, context) {

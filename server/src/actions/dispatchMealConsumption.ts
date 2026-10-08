@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { dispatchMealConsumption } from '../../../../../src/modules/pos/actions'
+import { dispatchMealConsumption } from '../../../src/modules/pos/actions'
 
 
 export default async function (args, context) {

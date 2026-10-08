@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { getMenuItemsCatalog } from '../../../../../src/modules/inventory/queries'
+import { getMenuItemsCatalog } from '../../../src/modules/inventory/queries'
 
 
 export default async function (args, context) {

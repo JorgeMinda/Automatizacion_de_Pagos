@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { setUserRole } from '../../../../../src/modules/payments/actions'
+import { setUserRole } from '../../../src/modules/payments/actions'
 
 
 export default async function (args, context) {

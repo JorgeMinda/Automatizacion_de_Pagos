@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { createMenuItemRecipe } from '../../../../../src/modules/inventory/actions'
+import { createMenuItemRecipe } from '../../../src/modules/inventory/actions'
 
 
 export default async function (args, context) {

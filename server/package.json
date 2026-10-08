@@ -5,7 +5,7 @@
   "type": "module",
   "comment-filip": "The server.js location changed because we have now included client source files above .wasp/out/server/src.",
   "scripts": {
-    "bundle": "tsc --build && rollup --config --silent",
+    "bundle": "esbuild src/server.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=bundle/server.js",
     "start": "node --enable-source-maps -r dotenv/config bundle/server.js",
     "bundle-and-start": "npm run bundle && npm run start",
     "watch": "nodemon --exec 'npm run bundle-and-start || exit 1'",
@@ -31,15 +31,16 @@
   "morgan": "~1.10.0",
   "superjson": "^2.2.1"
 },
-  "devDependencies": {"@rollup/plugin-node-resolve": "^16.0.0",
-  "@tsconfig/node24": "latest",
-  "@types/cors": "^2.8.5",
-  "@types/express": "^5.0.0",
-  "@types/express-serve-static-core": "^5.0.0",
-  "@types/node": "^24.0.0",
-  "nodemon": "^2.0.19",
-  "rollup": "^4.9.6",
-  "rollup-plugin-esbuild": "^6.1.1",
-  "typescript": "6.0.3"
-}
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@types/cors": "^2.8.5",
+    "@types/express": "^5.0.0",
+    "@types/express-serve-static-core": "^5.0.0",
+    "@types/node": "^24.0.0",
+    "esbuild": "^0.25.0",
+    "nodemon": "^2.0.19",
+    "rollup": "^4.9.6",
+    "rollup-plugin-esbuild": "^6.1.1",
+    "typescript": "6.0.3"
+  }
 }

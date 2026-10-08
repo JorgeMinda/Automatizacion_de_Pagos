@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { getParentStudentsBalance } from '../../../../../src/modules/payments/queries'
+import { getParentStudentsBalance } from '../../../src/modules/payments/queries'
 
 
 export default async function (args, context) {

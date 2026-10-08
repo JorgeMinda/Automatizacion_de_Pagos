@@ -1,6 +1,6 @@
 import { prisma } from 'wasp/server'
 
-import { registerStudentForParent } from '../../../../../src/modules/payments/actions'
+import { registerStudentForParent } from '../../../src/modules/payments/actions'
 
 
 export default async function (args, context) {
