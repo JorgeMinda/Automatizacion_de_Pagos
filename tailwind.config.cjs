@@ -8,34 +8,27 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        cyber: {
-          bg: '#05030a',
-          surface: '#0a0512',
-          panel: 'rgba(15, 8, 26, 0.7)',
-          border: 'rgba(255, 255, 255, 0.08)',
+        lux: {
+          bg: '#08050e',
+          surface: 'rgba(18, 10, 30, 0.45)',
+          amber: '#f59e0b',
+          amberGlow: 'rgba(245, 158, 11, 0.4)',
+          orange: '#ff6b35',
           purple: '#9d4edd',
-          purpleGlow: 'rgba(157, 78, 221, 0.35)',
           pink: '#f72585',
-          pinkGlow: 'rgba(247, 37, 133, 0.35)',
-          cyan: '#4cc9f0',
-          emerald: '#10b981',
-          rose: '#ef4444'
+          emerald: '#10b981'
         }
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'],
         mono: ['Space Grotesk', 'monospace']
       },
-      backdropBlur: {
-        xs: '2px',
-        md: '12px',
-        xl: '16px',
-        '2xl': '24px'
-      },
       boxShadow: {
-        'neon-purple': '0 0 25px -5px rgba(157, 78, 221, 0.4)',
-        'neon-pink': '0 0 25px -5px rgba(247, 37, 133, 0.4)',
-        'glass-card': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+        'glass-luxury': '0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2)',
+        'glass-layer': '0 30px 60px rgba(0, 0, 0, 0.6), inset 0 2px 2px rgba(255, 255, 255, 0.35)',
+        'btn-amber': '0 10px 25px -5px rgba(245, 158, 11, 0.5)',
+        'btn-purple': '0 10px 25px -5px rgba(157, 78, 221, 0.5)'
       }
     }
   },

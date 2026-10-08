@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { X, RefreshCw, ShieldCheck } from 'lucide-react';
 
 interface QRCardModalProps {
@@ -54,7 +54,7 @@ export const QRCardModal: React.FC<QRCardModalProps> = ({ isOpen, onClose, stude
 
         {/* Contenedor QR con Borde Luminoso */}
         <div className="my-6 p-4 bg-white rounded-2xl inline-block shadow-lg shadow-violet-500/10">
-          <QRCode
+          <QRCodeSVG
             value={dynamicQrPayload}
             size={200}
             level="H"

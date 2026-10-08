@@ -1,9 +1,8 @@
-import type { Api } from 'wasp/server/api';
 import { PontificoERPAdapter, PontificoSyncPayload } from './client';
 import { RecipeDecompositionService } from '../../modules/inventory/recipeService';
 
 /**
- * Worker ejecutado por Wasp Job (PgBoss) para reintentar sincronizaciones pendientes.
+ * Worker ejecutado para sincronización de inventario con Pontífico.
  */
 export async function syncPontificoInventoryWorker(args: any, context: any) {
   const pendingDeliveries = await context.entities.DeliveryRecord.findMany({
@@ -54,13 +53,12 @@ export async function syncPontificoInventoryWorker(args: any, context: any) {
 /**
  * Endpoint webhook para recibir confirmaciones o auditorías desde Pontífico.
  */
-export const handlePontificoSyncWebhook: Api = async (req, res, context) => {
+export const handlePontificoSyncWebhook = async (req: any, res: any, context: any) => {
   const signature = req.headers['x-pontifico-signature'];
   if (!signature) {
     return res.status(401).json({ error: 'Falta firma criptográfica HMAC.' });
   }
 
-  // Procesar eventos entrantes de ajuste de inventario
   const { eventId, status } = req.body;
   if (eventId && status === 'CONFIRMED') {
     await context.entities.DeliveryRecord.updateMany({

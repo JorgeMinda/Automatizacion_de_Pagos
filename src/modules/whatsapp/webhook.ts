@@ -1,8 +1,7 @@
-import type { Api } from 'wasp/server/api';
 import { WhatsAppStateMachine } from './stateMachine';
 import { WhatsAppCloudApiAdapter } from './whatsappService';
 
-export const handleWhatsAppWebhook: Api = async (req, res, context) => {
+export const handleWhatsAppWebhook = async (req: any, res: any, context: any) => {
   const body = req.body;
 
   if (!body || body.object !== 'whatsapp_business_account') {
@@ -20,7 +19,6 @@ export const handleWhatsAppWebhook: Api = async (req, res, context) => {
     return res.status(200).send('IGNORED_NO_TEXT');
   }
 
-  // 1. Obtener menú de la base de datos central en tiempo real
   const activeMenuItems = await context.entities.MenuItemRecipe.findMany({
     where: { active: true },
     select: { name: true, price: true }
@@ -31,17 +29,15 @@ export const handleWhatsAppWebhook: Api = async (req, res, context) => {
     price: Number(item.price)
   }));
 
-  // 2. Procesar respuesta mediante la máquina de estados desacoplada
   const replyMessage = WhatsAppStateMachine.processMessage(textBody, formattedMenu);
 
-  // 3. Enviar respuesta usando el adaptador
   const messenger = new WhatsAppCloudApiAdapter();
   await messenger.sendTextMessage(fromNumber, replyMessage);
 
   return res.status(200).json({ status: 'PROCESSED' });
 };
 
-export const verifyWhatsAppWebhook: Api = (req, res) => {
+export const verifyWhatsAppWebhook = (req: any, res: any) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
   const challenge = req.query['hub.challenge'];

@@ -1,9 +1,10 @@
-import { HttpError } from 'wasp/server';
+import { HttpError, prisma } from 'wasp/server';
 import type { DispatchMealConsumption, SyncOfflineBatchDeliveries } from 'wasp/server/operations';
 import { Prisma } from '@prisma/client';
 import { DoubleEntryLedgerService } from '../payments/ledgerService';
 
 interface DispatchMealInput {
+  [key: string]: any;
   idempotencyKey: string;
   studentId: string;
   menuItemSku: string;
@@ -12,11 +13,17 @@ interface DispatchMealInput {
 }
 
 interface OfflineDeliveryItem {
+  [key: string]: any;
   idempotencyKey: string;
   studentId: string;
   menuItemSku: string;
   posStationId: string;
   offlineTimestamp: string;
+}
+
+interface SyncOfflineBatchInput {
+  [key: string]: any;
+  deliveries: OfflineDeliveryItem[];
 }
 
 export const dispatchMealConsumption: DispatchMealConsumption<
@@ -33,7 +40,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
     throw new HttpError(400, 'Datos incompletos para procesar el despacho.');
   }
 
-  // 1. Verificación de Idempotencia previa
   const existingDelivery = await context.entities.DeliveryRecord.findUnique({
     where: { idempotencyKey }
   });
@@ -46,10 +52,8 @@ export const dispatchMealConsumption: DispatchMealConsumption<
     };
   }
 
-  // 2. Ejecución bajo aislamiento transaccional estricto (ACID)
-  return await context.entities.$transaction(
+  return await prisma.$transaction(
     async (tx: Prisma.TransactionClient) => {
-      // A. Consultar al estudiante con bloqueo
       const student = await tx.student.findUnique({
         where: { id: studentId },
         include: {
@@ -65,7 +69,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
         throw new HttpError(404, 'Estudiante no encontrado en la base de datos central.');
       }
 
-      // B. Verificación de Alergias Críticas
       const criticalAllergies = student.allergies.filter((a) => a.severity === 'CRITICO');
       if (criticalAllergies.length > 0 && !forceAllergyOverride) {
         throw new HttpError(
@@ -76,7 +79,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
         );
       }
 
-      // C. Consultar Ítem de Menú / Receta
       const menuItem = await tx.menuItemRecipe.findUnique({
         where: { skuPontifico: menuItemSku }
       });
@@ -88,7 +90,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
       let selectedPackageId: string | null = null;
       let remainingUnits = 0;
 
-      // D. Lógica de deducción: Priorizar Paquete de Almuerzos si es plato producido
       if (menuItem.type === 'PRODUCIDO' && student.packages.length > 0) {
         const activePackage = student.packages[0];
         selectedPackageId = activePackage.id;
@@ -102,7 +103,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
 
         remainingUnits = updatedPackage.availableUnits;
       } else {
-        // Deducción de Monedero Monetario
         if (student.walletBalance.lessThan(menuItem.price)) {
           throw new HttpError(
             402,
@@ -117,7 +117,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
           }
         });
 
-        // Registro en Ledger para Wallet
         const walletAccount = await DoubleEntryLedgerService.getOrCreateAccount(tx, student.id, 'STUDENT_WALLET');
         const revenueAccount = await DoubleEntryLedgerService.getOrCreateAccount(tx, null, 'REVENUE_SALES');
 
@@ -129,7 +128,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
         });
       }
 
-      // E. Registro inmutable de la entrega
       const delivery = await tx.deliveryRecord.create({
         data: {
           idempotencyKey,
@@ -142,7 +140,6 @@ export const dispatchMealConsumption: DispatchMealConsumption<
         }
       });
 
-      // F. Registro de Auditoría
       await tx.auditLog.create({
         data: {
           userId: context.user!.id,
@@ -172,7 +169,7 @@ export const dispatchMealConsumption: DispatchMealConsumption<
 };
 
 export const syncOfflineBatchDeliveries: SyncOfflineBatchDeliveries<
-  { deliveries: OfflineDeliveryItem[] },
+  SyncOfflineBatchInput,
   { processed: number; duplicatesIgnored: number; errors: string[] }
 > = async (args, context) => {
   if (!context.user || (context.user.role !== 'CAJERO' && context.user.role !== 'ADMIN')) {
@@ -186,7 +183,6 @@ export const syncOfflineBatchDeliveries: SyncOfflineBatchDeliveries<
 
   for (const item of deliveries) {
     try {
-      // Verificar si ya existe
       const existing = await context.entities.DeliveryRecord.findUnique({
         where: { idempotencyKey: item.idempotencyKey }
       });
@@ -202,7 +198,7 @@ export const syncOfflineBatchDeliveries: SyncOfflineBatchDeliveries<
           studentId: item.studentId,
           menuItemSku: item.menuItemSku,
           posStationId: item.posStationId,
-          forceAllergyOverride: true // Despacho físico ya consumido en caja
+          forceAllergyOverride: true
         },
         context
       );

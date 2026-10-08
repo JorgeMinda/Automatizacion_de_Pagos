@@ -1,9 +1,10 @@
-import { HttpError } from 'wasp/server';
+import { HttpError, prisma } from 'wasp/server';
 import type { ProcessDirectPayment } from 'wasp/server/operations';
 import { Prisma } from '@prisma/client';
 import { DoubleEntryLedgerService } from './ledgerService';
 
 interface ProcessPaymentInput {
+  [key: string]: any;
   studentId: string;
   amount: number;
   destination: 'PAQUETE' | 'MONEDERO';
@@ -12,7 +13,7 @@ interface ProcessPaymentInput {
   unitPrice?: number;
 }
 
-export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { success: boolean; paymentId: string; newBalance?: number; packageId?: string }> = async (
+export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { success: boolean; paymentId: string; packageId?: string }> = async (
   args,
   context
 ) => {
@@ -26,7 +27,6 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
     throw new HttpError(400, 'Parámetros de pago inválidos o incompletos.');
   }
 
-  // Verificación de unicidad en la referencia bancaria para evitar doble acreditación
   const existingPayment = await context.entities.Payment.findUnique({
     where: { bankReference }
   });
@@ -35,8 +35,7 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
     throw new HttpError(409, 'Esta referencia bancaria ya ha sido procesada previamente.');
   }
 
-  return await context.entities.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 1. Validar que el estudiante pertenezca al padre o sea autorizado por admin
+  return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const student = await tx.student.findUnique({
       where: { id: studentId }
     });
@@ -49,7 +48,6 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
       throw new HttpError(403, 'No tiene autorización para acreditar saldos a este estudiante.');
     }
 
-    // 2. Registrar el Pago bancario
     const decimalAmount = new Prisma.Decimal(amount.toFixed(2));
     const payment = await tx.payment.create({
       data: {
@@ -66,7 +64,6 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
       }
     });
 
-    // 3. Crear Cuentas de Doble Entrada
     const cashGatewayAccount = await DoubleEntryLedgerService.getOrCreateAccount(tx, null, 'CASH_GATEWAY');
     let createdPackageId: string | undefined = undefined;
 
@@ -94,8 +91,7 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
         paymentId: payment.id
       });
     } else {
-      // Destino: Monedero Monetario
-      const updatedStudent = await tx.student.update({
+      await tx.student.update({
         where: { id: student.id },
         data: {
           walletBalance: { increment: decimalAmount }
@@ -112,7 +108,6 @@ export const processDirectPayment: ProcessDirectPayment<ProcessPaymentInput, { s
       });
     }
 
-    // 4. Auditoría
     await tx.auditLog.create({
       data: {
         userId: context.user!.id,
