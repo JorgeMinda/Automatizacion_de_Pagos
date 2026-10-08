@@ -4,9 +4,8 @@ services:
     name: luxlunch-server
     runtime: node
     plan: free
-    rootDir: server
     buildCommand: npm install
-    startCommand: npx prisma db push --accept-data-loss && npm start
+    startCommand: npx prisma db push --accept-data-loss && cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -23,7 +22,6 @@ services:
   - type: web
     name: luxlunch-client
     runtime: static
-    rootDir: web-app
     buildCommand: npm install && npm run build
     staticPublishPath: build
     envVars:
